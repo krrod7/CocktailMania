@@ -1,7 +1,7 @@
 const express = require('express');
 const redis = require('redis');
 const cors = require('cors');
-const fetch = require('node-fetch');
+const fetch = require('node-fetch'); // Ensure node-fetch is installed
 
 const app = express();
 const router = express.Router();
@@ -34,6 +34,10 @@ router.get('/drinks', async (req, res) => {
 
     try {
         client.get("drinkInfo", async (err, cachedData) => {
+            if (err) {
+                console.error('Error getting data from Redis:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
             if (cachedData) {
                 let parsedData = JSON.parse(cachedData);
                 console.log(`Cached: ${parsedData}`);
