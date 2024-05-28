@@ -4,6 +4,9 @@ const cocktailConfig = require('../config/cocktailConfig');
 const Redis = require('ioredis');
 const redis = new Redis();
 
+const app = express();
+const client = redis.createClient(process.env.REDISCLOUD_URL);
+
 //matches http://localhost:3000/drinks
 //
 router.get('/', async (req, res, next) => {
