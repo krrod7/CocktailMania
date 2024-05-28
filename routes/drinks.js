@@ -1,8 +1,16 @@
 const express = require('express');
-const router = express.Router();
-const cocktailConfig = require('../config/cocktailConfig');
+const redis = require('redis');
 const cors = require('cors');
+const fetch = require('node-fetch');
+
 const app = express();
+const router = express.Router();
+
+// Use CORS middleware
+app.use(cors({
+    origin: 'https://cocktail-mania2.vercel.app', // Update this to your Vercel app's URL
+    optionsSuccessStatus: 200
+}));
 
 // Create Redis client
 let client;
@@ -11,44 +19,50 @@ try {
 } catch (error) {
     console.error('Error creating Redis client:', error);
 }
+
 client.on('error', (err) => {
     console.error('Error connecting to Redis:', err);
 });
 
-// Use CORS middleware
-app.use(cors({
-    origin: 'https://cocktail-mania2.vercel.app', // Update this to your Vercel app's URL
-    optionsSuccessStatus: 200
-}));
-
-//matches http://localhost:3000/drinks
-//
-router.get('/drinks', async (req, res, next) => {
-    const searchTerm = req.query.search
+// Define the drinks route
+router.get('/drinks', async (req, res) => {
+    const searchTerm = req.query.search;
     const cocktailConfig = {
         url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php',
         queryString: `?s=${searchTerm}`
-    }
+    };
 
     try {
-        let cachedData = await redis.get("drinkInfo");
-        if (cachedData) {
-            let parsedData = await JSON.parse(cachedData);
-            console.log(`Cached: ${parsedData}`);
-            parsedData.cached = true;
-            res.json(parsedData)
-        }
-        let rawDrinkInfo = await fetch(cocktailConfig.url + cocktailConfig.queryString)
-        let parsedData = await rawDrinkInfo.json();
+        client.get("drinkInfo", async (err, cachedData) => {
+            if (cachedData) {
+                let parsedData = JSON.parse(cachedData);
+                console.log(`Cached: ${parsedData}`);
+                parsedData.cached = true;
+                return res.json(parsedData);
+            }
 
+            const rawDrinkInfo = await fetch(cocktailConfig.url + cocktailConfig.queryString);
+            const parsedData = await rawDrinkInfo.json();
+            console.table(parsedData.drinks);
 
-
-        console.table(`drinks: ${parsedData}`);
-        let response = await redis.set("drinkInfo", parsedData, "EX", 15);
-        parsedData.cached = false;
-        res.json(parsedData);
+            client.setex("drinkInfo", 15, JSON.stringify(parsedData));
+            parsedData.cached = false;
+            res.json(parsedData);
+        });
     } catch (err) {
         console.log(`Error: ${err}`);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-})
-module.exports = router; //the export makes router visible to any file that require()s it
+});
+
+// Use JSON middleware
+app.use(express.json());
+
+// Integrate the router into the app
+app.use('/', router);
+
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
