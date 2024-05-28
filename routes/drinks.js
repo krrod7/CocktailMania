@@ -4,7 +4,18 @@ const cocktailConfig = require('../config/cocktailConfig');
 const Redis = require('ioredis');
 const redis = new Redis();
 
-const redis = new Redis(process.env.REDISCLOUD_URL);
+const redisUrl = process.env.REDISCLOUD_URL;
+console.log('Redis URL:', redisUrl); // Log the Redis URL
+
+const redis = new Redis(redisUrl);
+
+redis.on('connect', () => {
+    console.log('Connected to Redis');
+});
+
+redis.on('error', (err) => {
+    console.error('Redis connection error:', err);
+});
 
 //matches http://localhost:3000/drinks
 //
