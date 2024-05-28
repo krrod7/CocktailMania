@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const cocktailConfig = require('../config/cocktailConfig');
-const Redis = require('ioredis');
-const redis = new Redis();
+const app = express();
+const client = redis.createClient(process.env.REDISCLOUD_URL);
+
+client.on('error', (err) => {
+    console.error('Error connecting to Redis:', err);
+});
 
 //matches http://localhost:3000/drinks
 //
