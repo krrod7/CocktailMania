@@ -3,24 +3,6 @@ const router = express.Router();
 const cocktailConfig = require('../config/cocktailConfig');
 const Redis = require('ioredis');
 const redis = new Redis();
-const cors = require('cors');
-
-const app = express();
-const client = redis.createClient(process.env.REDISCLOUD_URL);
-
-const allowedOrigins = ['https://cocktail-mania2.vercel.app'];
-
-const corsOptions = {
-    origin: function (origin, callback) {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    }
-};
-
-app.use(cors(corsOptions));
 
 //matches http://localhost:3000/drinks
 //
