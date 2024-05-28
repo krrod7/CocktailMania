@@ -11,7 +11,10 @@ var drinksRouter = require('./routes/drinks');
 
 var app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://cocktail-mania2.vercel.app', // Update to your Vercel app's URL
+  optionsSuccessStatus: 200
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
