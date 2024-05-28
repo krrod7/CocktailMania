@@ -1,21 +1,12 @@
 const express = require('express');
-const redis = require('redis');
-const cors = require('cors');
-const fetch = require('node-fetch'); // Ensure node-fetch is installed
-
-const app = express();
 const router = express.Router();
+const redis = require('redis');
+const fetch = require('node-fetch');
 
-// Use CORS middleware
-app.use(cors({
-    origin: 'https://cocktail-mania2.vercel.app', // Update this to your Vercel app's URL
-    optionsSuccessStatus: 200
-}));
-
-// Create Redis client
 let client;
 try {
     client = redis.createClient(process.env.REDISCLOUD_URL);
+    console.log('Redis client created successfully');
 } catch (error) {
     console.error('Error creating Redis client:', error);
 }
@@ -24,8 +15,7 @@ client.on('error', (err) => {
     console.error('Error connecting to Redis:', err);
 });
 
-// Define the drinks route
-router.get('/drinks', async (req, res) => {
+router.get('/', async (req, res) => {
     const searchTerm = req.query.search;
     const cocktailConfig = {
         url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php',
@@ -59,14 +49,4 @@ router.get('/drinks', async (req, res) => {
     }
 });
 
-// Use JSON middleware
-app.use(express.json());
-
-// Integrate the router into the app
-app.use('/', router);
-
-// Start the server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+module.exports = router;
