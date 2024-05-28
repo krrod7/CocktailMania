@@ -23,7 +23,7 @@ app.use(cors({
 
 //matches http://localhost:3000/drinks
 //
-router.get('/', async (req, res, next) => {
+router.get('/drinks', async (req, res, next) => {
     const searchTerm = req.query.search
     const cocktailConfig = {
         url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php',
