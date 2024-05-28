@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const cocktailConfig = require('../config/cocktailConfig');
 const Redis = require('ioredis');
-const redis = new Redis();
 
 const redisUrl = process.env.REDISCLOUD_URL;
 console.log('Redis URL:', redisUrl); // Log the Redis URL
