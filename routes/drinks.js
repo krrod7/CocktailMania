@@ -16,6 +16,7 @@ client.on('error', (err) => {
 });
 
 router.get('/', async (req, res) => {
+    res.set('Access-Control-Allow-Origin', 'https://cocktail-mania2.vercel.app/');
     const searchTerm = req.query.search;
     const cocktailConfig = {
         url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php',
