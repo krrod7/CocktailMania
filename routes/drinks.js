@@ -3,10 +3,17 @@ const router = express.Router();
 const cocktailConfig = require('../config/cocktailConfig');
 const app = express();
 const client = redis.createClient(process.env.REDISCLOUD_URL);
+const cors = require('cors');
 
 client.on('error', (err) => {
     console.error('Error connecting to Redis:', err);
 });
+
+// Use CORS middleware
+app.use(cors({
+    origin: 'https://cocktail-mania2.vercel.app', // Update this to your Vercel app's URL
+    optionsSuccessStatus: 200
+}));
 
 //matches http://localhost:3000/drinks
 //
