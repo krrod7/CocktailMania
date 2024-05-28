@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const cocktailConfig = require('../config/cocktailConfig');
-const app = express();
-const client = redis.createClient(process.env.REDISCLOUD_URL);
 const cors = require('cors');
+const app = express();
 
+// Create Redis client
+let client;
+try {
+    client = redis.createClient(process.env.REDISCLOUD_URL);
+} catch (error) {
+    console.error('Error creating Redis client:', error);
+}
 client.on('error', (err) => {
     console.error('Error connecting to Redis:', err);
 });
