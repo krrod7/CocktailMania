@@ -38,8 +38,8 @@ router.get('/', async (req, res, next) => {
 
 
 
-        console.table(`drinks: ${parsedData}`);
-        let response = await redis.set("drinkInfo", parsedData, "EX", 15);
+        console.log('Data to be cached:', JSON.stringify(parsedData));
+        await redis.set("drinkInfo", JSON.stringify(parsedData), "EX", 15);
         parsedData.cached = false;
         res.json(parsedData);
     } catch (err) {
